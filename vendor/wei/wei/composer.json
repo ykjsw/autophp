@@ -1,0 +1,26 @@
+{
+    "name": "wei/wei",
+    "description": "A micro-framework provided powerful and simple APIs for faster and easier PHP 5.3+ development.",
+    "type": "library",
+    "keywords": ["framework", "cache", "database", "validator"],
+    "homepage": "https://github.com/twinh/wei",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.4"
+    },
+    "require-dev": {
+        "joseph-lenton/php-error": "dev-master",
+        "satooshi/php-coveralls": "dev-master",
+        "phpunit/phpunit": "4.5.*"
+    },
+    "authors": [
+        {
+            "name": "Twin Huang",
+            "email": "twinhuang@qq.com",
+            "homepage": "https://github.com/twinh/wei"
+        }
+    ],
+    "autoload": {
+        "files": ["lib/Wei.php"]
+    }
+}

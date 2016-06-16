@@ -1,0 +1,26 @@
+{
+    "require": {
+        "nikic/fast-route": "0.6.*",
+        "wei/wei": "^0.9.20",
+        "guzzlehttp/guzzle": "^6.0",
+        "chuyskywalker/rolling-curl": "^3.1",
+        "gregwar/image": "^2.0",
+        "hashids/hashids": "^1.0",
+        "gregwar/captcha": "^1.1",
+        "nette/mail": "^2.3"
+    },
+    "autoload": {
+		"classmap": [
+			"app/class",
+			"app/controller",
+			"app/cmd"
+		],
+		"files": [
+			"app/function/utility.php",
+			"app/function/autophp.php"
+		]
+	},
+	"repositories": [
+        
+    ]
+}

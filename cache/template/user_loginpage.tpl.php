@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--[if IE 8]>
+<html xmlns="http://www.w3.org/1999/xhtml" class="ie8" lang="zh-CN">
+<![endif]-->
+<!--[if !(IE 8) ]><!-->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN">
+<!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>登录AutoPHP</title>
+<link rel="stylesheet" href="/static/css/auto.login.css" type='text/css' media='all' />
+</head>
+
+<body class="login login-action-login wp-core-ui">
+<div id="login">
+<h1><a href="http://www.autophp.net/" title="基于AutoPHP" tabindex="-1">AutoPHP</a></h1>
+<div id="login_error">
+<strong>错误</strong>: <span></span>
+</div>
+
+<form name="loginform" id="loginform" action="http://www.cpper.net/wp-login.php" method="post">
+<p>
+<label for="user_login">用户名<br />
+<input type="text" name="log" id="user_login" class="input" value="" size="20" /></label>
+</p>
+<p>
+<label for="user_pass">密码<br />
+<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" /></label>
+</p>
+<p class="forgetmenot">
+<label for="rememberme"><input name="rememberme" type="checkbox" id="rememberme" value="forever"  /> 记住我的登录信息</label>
+</p>
+<p class="submit">
+<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="登录" />
+<input type="hidden" name="redirect_to" value="http://www.cpper.net/wp-admin/" />
+</p>
+</form>
+
+<p id="nav">
+<a href="/register">← 注册</a>
+</p>
+</div>
+
+</body>
+</html>

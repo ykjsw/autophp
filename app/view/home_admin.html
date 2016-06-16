@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta content="width=device-width,initial-scale=1,user-scalable=no" name="viewport" />
+    <title>AutoPHP</title>
+    <script src="http://apps.bdimg.com/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/lib/bootstrap/css/bootstrap.min.css" />
+	<script src="/static/lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/static/lib/layer/layer.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="/static/lib/easytree/skin-xp/ui.easytree.css" />
+
+	<link rel="stylesheet" type="text/css" href="/static/css/auto.admin.css" />
+	<script src="/static/js/auto.common.js"></script>
+	
+	<script type="text/javascript">
+		document.domain = "<!--{COOKIE_DOMAIN}-->";
+	</script>
+</head>
+<body>
+	
+<div class="wrap">
+	
+	<div id="left">
+		<div id="menu">
+			<!--{$data['menu']}-->
+		</div>
+	</div>
+
+	<div id="main">
+		<iframe id="framebody" name="framebody" scrolling="no" frameborder="0"></iframe>
+	</div>
+</div>
+
+<script src="/static/lib/easytree/jquery.easytree.min.js"></script>
+<script src="/static/lib/iframe-resizer/iframeResizer.min.js"></script>
+
+<script>
+	(function(){
+		
+		$('#menu').easytree();
+		
+		var autoHeight = function(){
+			$("#main").css({height: $("#left").height()});
+		}
+		
+		//autoHeight();
+		
+		//$(window).resize(autoHeight);
+		
+		iFrameResize({
+			log: true,
+			checkOrigin: false
+		});
+		
+		var jas = $("a[target=framebody]");
+		if(jas.length > 0){
+			$("#framebody").attr("src", jas[0].href);
+		}
+		
+	})();
+</script>
+
+</body>
+</html>
