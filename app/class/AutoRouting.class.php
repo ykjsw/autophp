@@ -2,7 +2,11 @@
 
 class AutoRouting extends \Wei\Base{
 
-	public function genCacheFile($row = array()){
+	public function callGenCache($act, $row){
+		$this->genCacheFile();
+	}
+
+	public function genCacheFile(){
 		$rows = wei()->db('ap_auto_routing')->fetchAll();
 		
 		if($rows){

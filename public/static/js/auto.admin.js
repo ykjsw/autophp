@@ -1,7 +1,49 @@
 (function(auto){
 	
 	$(".auto-field-value").change(function(){
-		$(this).attr("data-changed", "true");
+		//$(this).attr("data-changed", "true");
+
+		var $this = $(this);
+
+		if($(this).attr("type") === "checkbox"){
+			return false;
+		}
+
+		var old_md5 = $this.data("md5");
+		var new_md5 = md5(this.value);
+
+		console.log(old_md5, new_md5);
+
+		if(old_md5 !== new_md5){
+			$this.addClass("data-changed");
+		}else{
+			$this.removeClass("data-changed");
+		}
+	});
+
+	//checkbox特殊处理
+	$(".auto-field-value[type='checkbox']").click(function(){
+
+		var $parent = $(this).parent().parent();
+		var old_md5 = $parent.data("md5");
+		var row_id 	= $parent.data("row-id");
+
+		var vals = [];
+		$parent.find("input.auto-field-value").each(function(idx, ele){
+			if($(ele).is(":checked")){
+				vals.push(ele.value);
+			}
+		});
+
+		var new_md5 = md5(vals.join("|"));
+
+		console.log(old_md5, new_md5);
+
+		if(old_md5 !== new_md5){
+			$parent.addClass("data-changed");
+		}else{
+			$parent.removeClass("data-changed");
+		}
 	});
 	
 	$("select.auto-group").change(function(){
@@ -95,7 +137,7 @@
 	 * 1: {field: sdfsdf}
 	 */
 	var getRowUpdateData = function(row_id){
-		$doms = $("*[data-row-id="+row_id+"][data-changed=true]");
+		$doms = $(".data-changed[data-row-id="+row_id+"]");
 		
 		if($doms.length > 0){
 			
@@ -103,15 +145,15 @@
 			
 			$doms.each(function(idx, ele){
 				var field = $(this).data("field");
-				//多选框
-				if($(ele).attr("type") === "checkbox"){
+				//多选框父级
+				if(ele.tagName === "DIV"){
 					if(!obj[field]){
 						obj[field] = [];
 					}
 					
-					if($(ele).is(":checked")){
-						obj[field].push(ele.value);
-					}
+					$(ele).find("input:checked").each(function(idx2, ele2){
+						obj[field].push(ele2.value);
+					});
 				}else{
 					obj[field] = ele.value;
 				}
@@ -211,11 +253,16 @@
 				editors[field] = K.create(ele, {
 					resizeType : 1,
 					allowPreviewEmoticons : false,
-					allowImageUpload : false,
+					allowImageUpload : true,
 					items : [
 						'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
 						'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
-						'insertunorderedlist', '|', 'emoticons', 'image', 'link']
+						'insertunorderedlist', '|', 'emoticons', 'image', 'link'
+					],
+					afterChange: function(){
+						ele.value = editors[field].html();
+						$(ele).addClass("data-changed");
+					}
 				});
 			});
 		});
@@ -266,11 +313,11 @@
 	if($(".auto-json").length > 0){
 		$(".auto-json").each(function(idx, ele){
 			if(ele.value){
-				console.log(ele.value);
+				//console.log(ele.value);
 				var json = ele.value.replace(/</g, '&lt;');
 				json = json.replace(/>/g, '&gt;');
 				var result = parse(json);
-				console.log(result);
+				//console.log(result);
 				
 				$(ele).next("div").html(result.html);
 			}
@@ -279,7 +326,7 @@
 				var json = this.value.replace(/</g, '&lt;');
 				json = json.replace(/>/g, '&gt;');
 				var result = parse(json);
-				console.log(result);
+				//console.log(result);
 				
 				$(ele).next("div").html(result.html);
 			};
@@ -294,10 +341,10 @@
 				if(json.data.req.act_id == 1){
 					if(json.data.is_image == 1){
 						$("img[data-field="+json.data.req.field+"][data-row-id="+json.data.req.row_id+"]").attr("src", json.data.url);
-						$("input.auto-field-value[data-field="+json.data.req.field+"][data-row-id="+json.data.req.row_id+"]").val(json.data.url).attr("data-changed", "true");
+						$("input.auto-field-value[data-field="+json.data.req.field+"][data-row-id="+json.data.req.row_id+"]").val(json.data.url).addClass("data-changed");
 					}
 				}else if(json.data.req.act_id == 2){
-					$("textarea.auto-field-value[data-field="+json.data.req.field+"][data-row-id="+json.data.req.row_id+"]").val(json.data.type+":"+json.data.path).attr("data-changed", "true");
+					$("textarea.auto-field-value[data-field="+json.data.req.field+"][data-row-id="+json.data.req.row_id+"]").val(json.data.type+":"+json.data.path).addClass("data-changed");
 				}
 				
 			}

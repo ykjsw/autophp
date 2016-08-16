@@ -17,7 +17,7 @@ if($_SERVER['HTTP_HOST'] === 'autophp.net'){
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) use($config) {
 	
-	foreach($config['route'] AS $routeRule){
+	foreach($config['routing'] AS $routeRule){
 		$r->addRoute($routeRule['method'], $routeRule['path'], $routeRule['handler']);
 	}
 	

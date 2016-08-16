@@ -7,11 +7,10 @@ define('IS_MOBILE', is_mobile_client());
 $config = array();
 
 include(BASE_PATH . 'config/setting.php');
-include(BASE_PATH . 'config/route.php');
+include(BASE_PATH . 'config/routing.php');
 
 $wei = wei(array(
-		'db' => $config['mysql']['db'],
-		'elasticsearch' => $config['elasticsearch']
+		'db' => $config['mysql']['db']
 ));
 
 wei(array(

@@ -131,19 +131,6 @@ class User extends \Wei\Base{
 		return false;
 	}
 	
-	public function getUserInfoInForum($uid, $forumInfo){
-		$table = get_db_table('member', $forumInfo['table_id']);
-		
-		$record = wei()->db->find($table, array('uid' => $uid, 'fid' => $forumInfo['id']));
-		if($record){
-			$row = $record->toArray();
-			
-			return $row;
-		}
-		
-		return false;
-	}
-	
 	public function getUserList($q = null, $page = 1){
 		$db = wei()->db($this->table);
 		
@@ -172,58 +159,6 @@ class User extends \Wei\Base{
 	
 	public function updateUserInfo($uid, $data){
 		wei()->db->update($this->table, $data, array('id' => $uid));
-	}
-	
-	public function isFriend($uid, $fuid){
-		$table = get_db_table('friend');
-		
-		$record = wei()->db->find($table, array('uid' => $uid, 'fuid' => $fuid));
-		if($record){
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public function addFriend($uid, $fuid){
-		$table = get_db_table('friend');
-		
-		$data = array(
-				'uid'	=> $uid,
-				'fuid'	=> $fuid,
-				'create_time'	=> time()
-		);
-		
-		wei()->db->insert($table, $data);
-	}
-	
-	public function removeFriend($uid, $fuid){
-		$table = get_db_table('friend');
-		
-		wei()->db->delete($table, array('uid' => $uid, 'fuid' => $fuid));
-	}
-	
-	public function getFriendList($uid){
-		$table = get_db_table('friend');
-		
-		$rows = wei()->db($table)->where('uid = ' . $uid)->orderBy('id', 'ASC')->fetchAll();
-		if($rows){
-			$fuids = array();
-			foreach($rows as $row){
-				$fuids[] = $row['fuid'];
-			}
-			
-			$fusers_obj = $this->getUserInfoBatch($fuids);
-			
-			$fusers = array();
-			foreach($rows as $row){
-				$fusers[] = $fusers_obj[$row['fuid']];
-			}
-			
-			return $fusers;
-		}
-		
-		return false;
 	}
 	
 	public function setPassword($uid, $password){

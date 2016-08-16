@@ -67,6 +67,10 @@ input[data-field="user_id"]{
 	margin-bottom: 3px;
 }
 
+.data-changed{
+    border: 2px solid red;
+}
+
 #new-row{
 	width: 800px;
 	border: 1px dotted #ccc;

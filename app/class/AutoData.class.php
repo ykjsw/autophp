@@ -19,7 +19,7 @@ class AutoData extends \Wei\Base{
 				if(class_exists($class)){
 					$obj = new $class;
 					if(method_exists($obj, $method)){
-						call_user_func_array(array($obj, $method), array($data));
+						call_user_func_array(array($obj, $method), $data);
 					}
 				}
 			}

@@ -59,5 +59,6 @@ var AUTO_TABLEFIELD = <? echo json_encode($data['tablefield']) ?>;
 <script src="/static/lib/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script><? } ?><script src="/static/lib/iframe-resizer/iframeResizer.contentWindow.min.js"></script>
 
 <script src="/static/js/auto.json_parse.js"></script>
+<script src="/static/lib/md5.js"></script>
 
 <script src="/static/js/auto.admin.js"></script><? include template('snippet/auto_footer'); ?>

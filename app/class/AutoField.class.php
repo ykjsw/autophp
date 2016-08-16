@@ -2,8 +2,9 @@
 
 class AutoField extends \Wei\Base{
 	
-	private $notShowClass = array('QQWry', 'Wei\\Base', 'BaseController');
-	private $phpFunctions = array();
+	private $notShowClass	= array('QQWry', 'Wei\\Base', 'BaseController');
+	private $phpFunctions 	= array();
+	private $dbConfigs 		= array();
 	
 	public function getFieldHtmlRows($tablefields){
 		$rows = array();
@@ -25,13 +26,13 @@ class AutoField extends \Wei\Base{
 		$code = '';
 		switch ($type) {
 			case AUTO_FIELD_RICHTEXT:
-				$code = '<textarea data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="auto-field-value auto-richtext" rows="3" style="width:400px;height:200px;">'.htmlspecialchars($value).'</textarea>';
+				$code = '<textarea data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="auto-field-value auto-richtext" rows="3" style="width:400px;height:200px;">'.htmlspecialchars($value).'</textarea>';
 				break;
 			case AUTO_FIELD_TEXTAREA:
-				$code = '<textarea data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control auto-field-value" cols="40" rows="3">'.htmlspecialchars($value).'</textarea>';
+				$code = '<textarea data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control auto-field-value" cols="40" rows="3">'.htmlspecialchars($value).'</textarea>';
 				break;
 			case AUTO_FIELD_TEXTAREA_WITH_UPLOAD:
-				$code = '<textarea data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control auto-field-value auto-file-upload" rows="3">'.htmlspecialchars($value).'</textarea>';
+				$code = '<textarea data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control auto-field-value auto-file-upload" rows="3">'.htmlspecialchars($value).'</textarea>';
 				$code .= '<form action="/auto/upload" method="post" enctype="multipart/form-data" target="target-iframe">';
 				$code .= '<input type="hidden" name="callback" value="parent.auto.uploaded" />';
 				$code .= '<input type="hidden" name="field" value="'.$field.'" />';
@@ -42,7 +43,7 @@ class AutoField extends \Wei\Base{
 				$code .= '</form>';
 				break;
 			case AUTO_FIELD_JSON:
-				$code = '<textarea data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control auto-field-value auto-json" rows="3">'.htmlspecialchars($value).'</textarea>';
+				$code = '<textarea data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control auto-field-value auto-json" rows="3">'.htmlspecialchars($value).'</textarea>';
 				$code .= '<div class="json-struct" data-field="'.$field.'" data-row-id="'.$row_id.'">';
 				if($value){
 					$arr = json_decode($value, true);
@@ -54,7 +55,8 @@ class AutoField extends \Wei\Base{
 				break;
 			case AUTO_FIELD_SELECT:
 				$arr = $this->getSelectArray($param, $row);
-				$code .= '<select data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value">';
+				$code .= '<select data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value">';
+				$code .= '<option value="">---请选择---</option>';
 				foreach($arr as $val){
 					$slt = $value == $val[0] ? 'selected' : '';
 					$code .= '<option '.$slt.' value="'.addslashes($val[0]).'">'.$val[1].'</option>';
@@ -65,8 +67,8 @@ class AutoField extends \Wei\Base{
 				$code = '<span data-field="'.$field.'">'.$value.'</span>';
 				break;
 			case AUTO_FIELD_IMAGE:
-				$code .= '<img src="'.$value.'" data-field="'.$field.'" data-row-id="'.$row_id.'" class="auto-field-virtual-img" />';
-				$code .= '<input data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
+				$code .= '<img src="'.$value.'" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="auto-field-virtual-img" />';
+				$code .= '<input data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
 				$code .= '<form action="/auto/upload" method="post" enctype="multipart/form-data" target="target-iframe">';
 				$code .= '<input type="hidden" name="callback" value="parent.auto.uploaded" />';
 				$code .= '<input type="hidden" name="field" value="'.$field.'" />';
@@ -86,9 +88,9 @@ class AutoField extends \Wei\Base{
 				$html = array();
 				foreach($arr as $val){
 					$ckd = in_array($val[0], $vals) ? 'checked="checked"' : '';
-					$html[] = '<label><input class="auto-field-value" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" type="checkbox" '.$ckd.' value="'.addslashes($val[0]).'" />'.$val[1].'</label>';
+					$html[] = '<label><input class="auto-field-value" data-field="'.$field.'" data-row-id="'.$row_id.'" type="checkbox" '.$ckd.' value="'.addslashes($val[0]).'" />'.$val[1].'</label>';
 				}
-				$code = implode('<br />', $html);
+				$code = '<div data-field="'.$field.'" data-md5="'.md5(implode('|', $vals)).'" data-row-id="'.$row_id.'">'.implode('<br />', $html).'</div>';
 				break;
 			case AUTO_FIELD_VIRTUAL:
 				$code = '<span class="red">虚拟字段参数错误</span>';
@@ -114,9 +116,9 @@ class AutoField extends \Wei\Base{
 							}elseif($type === 'html'){
 								$code = $val;
 							}else{
-								$result = wei()->db->fetch($val);
-								if($result){
-									$code = array_shift($result);
+								$result = $this->dbQuery($val);
+								if(!empty($result)){
+									$code = array_shift($result[0]);
 								}else{
 									$code = '<span class="red">记录不存在</span>';
 								}
@@ -132,7 +134,7 @@ class AutoField extends \Wei\Base{
 				}
 				break;
 			case AUTO_FIELD_IP:
-				$code = '<input style="width:120px;" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
+				$code = '<input style="width:120px;" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
 				try{
 					if($value){
 						$address = wei()->qqwry->query($value);
@@ -143,33 +145,33 @@ class AutoField extends \Wei\Base{
 				}
 				break;
 			case AUTO_FIELD_QQ:
-				$code = '<input style="width:90px;" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
+				$code = '<input style="width:90px;" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
 				if($value){
 					$code .= '<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin='.$value.'&site=qq&menu=yes"><img style="margin-top:2px;" border="0" src="http://wpa.qq.com/pa?p=2:'.$value.':51" alt="点击这里发消息" title="点击这里发消息"/></a>';
 				}
 				break;
 			case AUTO_FIELD_FILESIZE:
-				$code = '<input style="width:90px;" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
+				$code = '<input style="width:90px;" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
 				if(is_numeric($value)){
 					$code .= '<span class="auto-field-virtual" data-field="'.$field.'" data-row-id="'.$row_id.'">'.format_size($value).'</span>';
 				}
 				break;
 			case AUTO_FIELD_TIMESTAMP:
-				$code = '<input style="width:95px;" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value auto-timestamp" type="text" value="'.addslashes($value).'" />';
+				$code = '<input style="width:95px;" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value auto-timestamp" type="text" value="'.addslashes($value).'" />';
 				$code .= '<span class="auto-field-virtual" data-field="'.$field.'" data-row-id="'.$row_id.'">'.($value ? date('Y-m-d H:i:s', $value) : '').'</span>';
 				break;
 			case AUTO_FIELD_DATE:
-				$code = '<input style="width:85px;" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value auto-date" type="text" value="'.addslashes($value).'" />';
+				$code = '<input style="width:85px;" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value auto-date" type="text" value="'.addslashes($value).'" />';
 				break;
 			case AUTO_FIELD_DATETIME:
-				$code = '<input style="width:140px;" data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value auto-datetime" type="text" value="'.addslashes($value).'" />';
+				$code = '<input style="width:140px;" data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value auto-datetime" type="text" value="'.addslashes($value).'" />';
 				break;
 			case AUTO_FIELD_PASSWORD:
-				$code = '<input data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="password" value="'.addslashes($value).'" />';
+				$code = '<input data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="password" value="'.addslashes($value).'" />';
 				break;
 			case AUTO_FIELD_TEXT:
 			default:
-				$code = '<input data-changed="false" data-field="'.$field.'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
+				$code = '<input data-field="'.$field.'" data-md5="'.md5($value).'" data-row-id="'.$row_id.'" class="form-control input-sm auto-field-value" type="text" value="'.addslashes($value).'" />';
 				break;
 		}
 		
@@ -187,7 +189,8 @@ class AutoField extends \Wei\Base{
 		
 		//如果是sql语法
 		if($parts[0] === 'sql'){
-				
+			
+			//变量替换
 			preg_match_all('/\$([a-zA-Z0-9_]+)/is', $parts[1], $m);
 			if($m[1]){
 				foreach($m[1] as $key){
@@ -196,8 +199,9 @@ class AutoField extends \Wei\Base{
 					}
 				}
 			}
+
+			$rows = $this->dbQuery($parts[1]);
 			
-			$rows = wei()->db->fetchAll($parts[1]);
 			if($rows){
 				foreach($rows as $row){
 					$id = array_shift($row);
@@ -219,6 +223,90 @@ class AutoField extends \Wei\Base{
 		}
 		
 		return $arr;
+	}
+
+	//用户定义sql的查询封装
+	private function dbQuery($val){
+		$colon_count = substr_count($val, ':');
+
+		if($colon_count >= 3){
+			$parts = explode(':', $val, 4);
+
+			$this->getDBConfigs();
+
+			$db_config_name		= trim($parts[0]);
+			$db_name 			= trim($parts[1]);
+			$db_charset_utf8 	= trim($parts[2]);
+			$sql				= trim($parts[3]);
+
+			if(	$db_config_name &&
+				$db_name &&
+				$sql && 
+				strtolower(substr($sql, 0, 6)) === 'select' && 
+				isset($this->dbConfigs[$db_config_name])
+			){
+				$db_config = $this->dbConfigs[$db_config_name];
+				$dbkey = 'ap' . strtolower($db_config_name);
+
+				$cfg = array(
+					$dbkey.'.db'	=> array(
+								'driver'    => 'mysql',
+								'host'      => $db_config['host'],
+								'dbname'    => $db_name,
+								'user'      => $db_config['user'],
+								'password'  => $db_config['password'],
+					)
+				);
+
+				if($db_charset_utf8 === 'true'){
+					$cfg[$dbkey.'.db']['charset'] = 'utf8';
+				}
+
+				try{
+					if(!wei()->{$dbkey.'Db'}){
+						wei($cfg);
+					}
+				}catch(\BadMethodCallException $e){
+					wei($cfg);
+				}
+
+				$rows = wei()->{$dbkey.'Db'}->fetchAll($sql);
+			}
+		}else{
+			$rows = wei()->contentDb->fetchAll($val);
+		}
+
+		return $rows;
+	}
+
+	//生成配置db
+	public function getDBConfigs(){
+		if($this->dbConfigs){
+			return $this->dbConfigs;
+		}
+
+		$row = wei()->db->fetch('SELECT `auto_param` FROM ap_auto_config_tablefield WHERE config_id = 0 AND `field` = \'db_config\';');
+		if($row){
+			$str = substr($row['auto_param'], 5);
+
+			$arr = explode('|', $str);
+			foreach($arr as $item){
+				$tmp = explode(':', $item);
+				$alias = $tmp[count($tmp) - 1];
+
+				$dbinfo = explode(' ', rtrim($item, ':'.$alias));
+
+				$this->dbConfigs[$alias] = array(
+							'host'		=> $dbinfo[0].':'.$dbinfo[1],
+							'user'		=> $dbinfo[2],
+							'password'	=> $dbinfo[3]
+				);
+			}
+
+			return $this->dbConfigs;
+		}
+
+		return array();
 	}
 
 	public function getPHPFunctions(){
@@ -294,7 +382,7 @@ class AutoField extends \Wei\Base{
 			$newArr[] = array($val, $val);
 		}
 		
-		array_unshift($newArr, array('', '无'));
+		//array_unshift($newArr, array('', '无'));
 		
 		$this->phpFunctions = $newArr;
 		

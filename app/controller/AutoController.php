@@ -46,9 +46,32 @@ class AutoController extends BaseController{
 		$querydata['id'] = $cid;
 		//$querydata['page'] = $page;
 		//$querydata['orderby'] = $orderby;
+
+		//contentDB
+		if($cid < 2){
+			wei()->contentDb = wei()->db;
+		}else{
+
+			$dbcfg = explode(' ', $config['db_config']);
+
+			if(!isset($dbcfg[3])){
+				exit('DB配置错误');
+			}
+
+			wei(array(
+				'content.db' => array(
+						'driver'    => 'mysql',
+						'host'      => $dbcfg[0].':'.$dbcfg[1],
+						'dbname'    => $config['db_name'],
+						'charset'   => $config['charset'],
+						'user'      => $dbcfg[2],
+						'password'  => $dbcfg[3],
+				)
+			));
+		}
 		
 		//列表内容
-		$listdb = wei()->db($config['db_table'])->where('1=1');
+		$listdb = wei()->contentDb($config['db_table'])->where('1=1');
 		
 		//是否有富文本 日期
 		$has_richtext_field		= false;
@@ -84,7 +107,9 @@ class AutoController extends BaseController{
 				
 				$querydata[$queryfield] = $queryid;
 				
-				unset($tablefields[$field['field']]);
+				if(isset($queryid)){
+					unset($tablefields[$field['field']]);
+				}
 			}elseif($field['auto_type'] == AUTO_FIELD_DEFAULT){
 				$listdb->andWhere($field['field'] . ' = ?', $field['auto_param']);
 				unset($tablefields[$field['field']]);
@@ -224,7 +249,7 @@ class AutoController extends BaseController{
 		
 		//针对checkbox值的json化处理
 		$create_data = array_map(function($value){
-			return is_array($value) ? json_encode($value) : $value;
+			return is_array($value) ? json_encode($value) : trim($value);
 		}, $create_data);
 		
 		wei()->db->insert($config['db_table'], $create_data);
@@ -234,8 +259,8 @@ class AutoController extends BaseController{
 		$new_row = wei()->db->select($config['db_table'], array($config['primary_key'] => $key_id));
 		
 		//触发回调
-		if($config['call_after_create'] !== ''){
-			wei()->autodata->callUserFunc($config['call_after_create'], $new_row);
+		if($config['callback'] !== ''){
+			wei()->autodata->callUserFunc($config['callback'], array('act' => 'create', 'data' => $new_row));
 		}
 
 		$this->json(array('ret' => 0, 'data' => array()));
@@ -283,7 +308,7 @@ class AutoController extends BaseController{
 				
 				//针对checkbox值的json化处理
 				$data['row_data'] = array_map(function($value){
-					return is_array($value) ? json_encode($value) : $value;
+					return is_array($value) ? json_encode($value) : trim($value);
 				}, $data['row_data']);
 					
 				wei()->db->update(
@@ -294,8 +319,8 @@ class AutoController extends BaseController{
 				
 				//触发回调
 				$db_row_data = wei()->db->select($config['db_table'], array($config['primary_key'] => $data['row_id']));
-				if($config['call_after_update'] !== ''){
-					wei()->autodata->callUserFunc($config['call_after_update'], $db_row_data);
+				if($config['callback'] !== ''){
+					wei()->autodata->callUserFunc($config['callback'], array('act' => 'update', 'data' => $db_row_data));
 				}
 			}
 		}
@@ -334,8 +359,8 @@ class AutoController extends BaseController{
 				$config['primary_key'] => $row_id
 			));
 			
-			if($config['call_after_update'] !== ''){
-				wei()->autodata->callUserFunc($config['call_after_update'], $db_row_data);
+			if($config['callback'] !== ''){
+				wei()->autodata->callUserFunc($config['callback'], array('act' => 'delete', 'data' => $db_row_data));
 			}
 		}
 		
